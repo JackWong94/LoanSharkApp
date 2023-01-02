@@ -243,8 +243,8 @@ public class Borrower implements Parcelable {
     }
 
     public void cancelAllBorrowings() {
-        for (int i=0; i<borrowedItemsList.size(); i++) {
-            cancelBorrow(borrowedItemsList.get(i));
+        while (borrowedItemsList.size() > 0) {
+            cancelBorrow(borrowedItemsList.get(0));
         }
     }
 
