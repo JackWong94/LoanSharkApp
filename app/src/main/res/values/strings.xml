@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">LoanSharkApp</string>
+    <string name="welcome_to_loan_shark_app">Welcome To \nLoan Shark App</string>
+    <string name="add_borrowing_details">Add Borrowing Details</string>
+    <string name="view_borrower_details">View Borrower Details</string>
+    <string name="exit">Exit</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="delete_this_profile">Delete This Profile</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <!-- Strings used for fragments for navigation -->
+
+    <!-- TODO: Remove or change this placeholder text -->
+</resources>
