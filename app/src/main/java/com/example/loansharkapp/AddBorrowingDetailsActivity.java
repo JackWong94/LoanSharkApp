@@ -5,11 +5,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.accessibility.AccessibilityManager;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -29,6 +25,8 @@ public class AddBorrowingDetailsActivity extends AppCompatActivity {
     private EditText borrowingReasonEditText, borrowingAmountEditText;
     private String borrowingReason = "";
     private float borrowingAmount = 0;
+    private static boolean targetProfilePreSelected = false;
+    private static String targetedProfilePreSelectedName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +44,7 @@ public class AddBorrowingDetailsActivity extends AppCompatActivity {
         borrowingAmountEditText = findViewById(R.id.borrowingAmountEditText);
         //Initialize spinner with borrowers profile name
         ArrayList<String> borrowerProfileNameList = new ArrayList<String>();
-        for (Borrower b:Borrower.getBorrowerList()) {
+        for (Borrower b : Borrower.getBorrowerList()) {
             borrowerProfileNameList.add(b.getName());
         }
 
@@ -54,20 +52,33 @@ public class AddBorrowingDetailsActivity extends AppCompatActivity {
         if (borrowerProfileNameList.isEmpty()) {
             borrowerProfileNameList.add("No Profile");
         }
-        ArrayAdapter<String>adapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_spinner_item,borrowerProfileNameList);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, borrowerProfileNameList);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         profileSpinner.setAdapter(adapter);
+
+        if (targetProfilePreSelected) {
+            //Fixed the targeted profile
+            profileSpinner.setSelection(borrowerProfileNameList.indexOf(targetedProfilePreSelectedName));
+            profileSpinner.setEnabled(false);
+        }
         profileSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 profileNameSelected = borrowerProfileNameList.get(position);
                 Toast.makeText(getApplicationContext(), profileNameSelected, Toast.LENGTH_SHORT).show();
+                //Set target profile pre select flag to false
+                targetProfilePreSelected = false;
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+    }
+    public static void addToTargetedProfile(String name) {
+        targetProfilePreSelected = true;
+        targetedProfilePreSelectedName = name;
     }
     public void hideActivityViewForFragment() {
         profileSpinner.setVisibility(View.INVISIBLE);

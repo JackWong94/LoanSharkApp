@@ -114,4 +114,27 @@
             android:text="Amount" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/linearLayout4"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/borrowItemListView">
+
+        <Button
+            android:id="@+id/buttonAddMoreBorrowingDetails"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Add More Borrow Details"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+            app:layout_constraintTop_toBottomOf="@+id/borrowItemListView"
+            tools:layout_editor_absoluteX="0dp" />
+    </LinearLayout>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -109,6 +109,18 @@ public class ViewBorrowerProfileDetailsFragment extends Fragment {
         TextView totalAmountTextView = view.findViewById(R.id.totalAmount);
         totalAmountTextView.setText(Borrower.toCurrencyFormatRM(borrowerInfo.totalBorrowingAmount));
 
+        //Setup Button Add More Borrowing Details
+        Button buttonAddMoreBorrowingDetails = view.findViewById(R.id.buttonAddMoreBorrowingDetails);
+        buttonAddMoreBorrowingDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent addBorrowingDetailsActivityIntent = new Intent(getContext(), AddBorrowingDetailsActivity.class);
+                startActivity(addBorrowingDetailsActivityIntent);
+                AddBorrowingDetailsActivity.addToTargetedProfile(borrowerInfo.getName());
+                refreshThisFragmentCalledFromButton(borrowerInfo);
+            }
+        });
+
         //Setup Button Ask For Payment
         if (!limitedAccess) {
             Button buttonAskForPayment = view.findViewById(R.id.buttonAskForPayment);
