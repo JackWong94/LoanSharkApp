@@ -6,12 +6,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Looper;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -19,7 +17,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.logging.Handler;
 
 public class Borrower implements Parcelable {
     static private Context context = null;
@@ -216,6 +213,13 @@ public class Borrower implements Parcelable {
         borrowedItemsList.add(borrowedItem);
     }
 
+    public void editingBorrow(BorrowedItem _borrowedItem, String _item, float _amount) {
+        //Update BorrowedItemList Details
+        totalBorrowingAmount -= _borrowedItem.amount;
+        _borrowedItem.editBorrowedItemAndAmount(this.getName(), _item,_amount);
+        totalBorrowingAmount += _amount;
+        modifyBorrowerProfileValueInDatabase(null, totalBorrowingAmount);
+    }
     public void cancelBorrow(BorrowedItem _borrowedItem) {
         int rowDeleted = 0;
         rowDeleted = BorrowedItem.cancelBorrowedItem(_borrowedItem, this.getName());
@@ -330,9 +334,14 @@ class BorrowedItem {
         this.index = _index;
         DatabaseHelperForBorrowingDetails myDb;
         myDb = new DatabaseHelperForBorrowingDetails(context, getDatabaseName(_borrowerName));
-        return myDb.updateData( String.valueOf(originalIndex), String.valueOf(_index), this.item, this.date, String.valueOf(this.amount));
+        return myDb.updateIndexData(String.valueOf(originalIndex), String.valueOf(_index), this.item, this.date, String.valueOf(this.amount));
     }
 
+    public boolean editBorrowedItemAndAmount(String _borrowerName, String _item, Float _amount) {
+        DatabaseHelperForBorrowingDetails myDb;
+        myDb = new DatabaseHelperForBorrowingDetails(context,getDatabaseName(_borrowerName));
+        return myDb.updateData(String.valueOf(this.index), _item, this.date, String.valueOf(_amount));
+    }
     public static BorrowedItem addNewBorrowedItem(int _newItemIndex, String _item, float _amount, String _borrowerName) {
         if (context == null) {
             Log.i(tag, "No Context Initialized");

@@ -4,12 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
-
-import java.io.File;
 
 public class DatabaseHelperForBorrowingDetails extends SQLiteOpenHelper {
 
@@ -61,7 +58,7 @@ public class DatabaseHelperForBorrowingDetails extends SQLiteOpenHelper {
         return res;
     }
 
-    public boolean updateData(String oriNo, String newNo, String item, String date, String amount) {
+    public boolean updateIndexData(String oriNo, String newNo, String item, String date, String amount) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL_2, newNo);
@@ -71,7 +68,16 @@ public class DatabaseHelperForBorrowingDetails extends SQLiteOpenHelper {
         db.update(TABLE_NAME, contentValues, "NO = ?", new String[] {oriNo});
         return true;
     }
-
+    public boolean updateData(String index, String item, String date, String amount) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(COL_2, index);
+        contentValues.put(COL_3, item);
+        contentValues.put(COL_4, date);
+        contentValues.put(COL_5, amount);
+        db.update(TABLE_NAME, contentValues, "NO = ?", new String[] {index});
+        return true;
+    }
     public Integer deleteData(String number) {
         SQLiteDatabase db = this.getWritableDatabase();
         return db.delete(TABLE_NAME, "NO = ?", new String[] {number});

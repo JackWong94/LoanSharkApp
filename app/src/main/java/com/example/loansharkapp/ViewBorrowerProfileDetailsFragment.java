@@ -13,12 +13,15 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.text.InputType;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -63,7 +66,76 @@ public class ViewBorrowerProfileDetailsFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setMessage("Delete Item Options");
+                    builder.setMessage("You can edit the selected item");
+                    builder.setNegativeButton("Edit", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Toast.makeText(getContext(),"Editing . . . ", Toast.LENGTH_SHORT).show();
+                            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("Edit Item Details");
+                            LinearLayout linearLayout = new LinearLayout(getContext());
+                            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                            ));
+                            linearLayout.setOrientation(LinearLayout.VERTICAL);
+                            linearLayout.setGravity(Gravity.CENTER);
+                            // Set margins (adjust as needed)
+                            LinearLayout.LayoutParams editParams = new LinearLayout.LayoutParams(
+                                    ViewGroup.LayoutParams.MATCH_PARENT,
+                                    ViewGroup.LayoutParams.WRAP_CONTENT
+                            );
+                            editParams.setMargins(80, 20, 80, 10); // left, top, right, bottom
+                            //Edit Item Name
+                            final TextView itemName = new TextView(getContext());
+                            itemName.setLayoutParams(editParams);
+                            itemName.setText("Change Item Name");
+                            linearLayout.addView(itemName);
+                            final EditText itemInput = new EditText(getContext());
+                            itemInput.setLayoutParams(editParams);
+                            itemInput.setText(borrowerInfo.borrowedItemsList.get(position).item);
+                            linearLayout.addView(itemInput);
+                            builder.setView(linearLayout);
+                            //Edit Item Amount
+                            final TextView itemAmount = new TextView(getContext());
+                            itemAmount.setLayoutParams(editParams);
+                            itemAmount.setText("Change Item Amount (RM)");
+                            linearLayout.addView(itemAmount);
+                            final EditText itemAmountInput = new EditText(getContext());
+                            itemAmountInput.setLayoutParams(editParams);
+                            itemAmountInput.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+                            String formattedValue = String.format("%.2f", borrowerInfo.borrowedItemsList.get(position).amount);
+                            itemAmountInput.setText(formattedValue);
+                            linearLayout.addView(itemAmountInput);
+                            builder.setView(linearLayout);
+                            builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+
+                                }
+                            });
+                            builder.setNegativeButton("Update", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    BorrowedItem borrowedItem = borrowerInfo.borrowedItemsList.get(position);
+                                    if (itemInput.getText().toString().equals("")) {
+                                        Toast.makeText(getContext(),"Please Fill In Borrowing Reason", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+                                    if (itemAmountInput.getText().toString().equals("")) {
+                                        Toast.makeText(getContext(),"Please Fill In Amount", Toast.LENGTH_SHORT).show();
+                                        return;
+                                    }
+
+                                    borrowerInfo.editingBorrow(borrowedItem, itemInput.getText().toString(), Float.valueOf(itemAmountInput.getText().toString()));
+                                    borrowedItem.item = itemInput.getText().toString();
+                                    borrowedItem.amount = Float.valueOf(itemAmountInput.getText().toString());
+                                    refreshThisFragmentCalledFromButton(borrowerInfo);
+                                }
+                            });
+                            builder.show();
+                        }
+                    });
                     builder.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -72,7 +144,7 @@ public class ViewBorrowerProfileDetailsFragment extends Fragment {
                             stringBuffer.append("Delete is not reversible.\nAre you sure?");
                             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                             builder.setMessage(stringBuffer);
-                            builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     BorrowedItem borrowedItem = borrowerInfo.borrowedItemsList.get(position);
@@ -80,7 +152,7 @@ public class ViewBorrowerProfileDetailsFragment extends Fragment {
                                     refreshThisFragmentCalledFromButton(borrowerInfo);
                                 }
                             });
-                            builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
 
@@ -90,14 +162,14 @@ public class ViewBorrowerProfileDetailsFragment extends Fragment {
                             alertDialog.show();
                         }
                     });
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
 
                         }
                     });
                     AlertDialog alertDialog = builder.create();
-                    alertDialog.setTitle("Receipts");
+                    alertDialog.setTitle("Editing Options");
                     alertDialog.show();
                 }
             });
@@ -117,7 +189,9 @@ public class ViewBorrowerProfileDetailsFragment extends Fragment {
                 Intent addBorrowingDetailsActivityIntent = new Intent(getContext(), AddBorrowingDetailsActivity.class);
                 startActivity(addBorrowingDetailsActivityIntent);
                 AddBorrowingDetailsActivity.addToTargetedProfile(borrowerInfo.getName());
+                //Fix this bug as the add more item will cause the previous not updated screen to appear
                 refreshThisFragmentCalledFromButton(borrowerInfo);
+
             }
         });
 
@@ -180,7 +254,7 @@ public class ViewBorrowerProfileDetailsFragment extends Fragment {
                 }
             });
         }else {
-            //Limited acess to this fragment, hide some button
+            //Limited access to this fragment, hide some button
             Button buttonAskForPayment = view.findViewById(R.id.buttonAskForPayment);
             buttonAskForPayment.setVisibility(View.INVISIBLE);
         }
