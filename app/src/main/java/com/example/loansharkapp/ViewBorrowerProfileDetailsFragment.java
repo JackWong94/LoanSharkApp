@@ -189,9 +189,9 @@ public class ViewBorrowerProfileDetailsFragment extends Fragment {
                 Intent addBorrowingDetailsActivityIntent = new Intent(getContext(), AddBorrowingDetailsActivity.class);
                 startActivity(addBorrowingDetailsActivityIntent);
                 AddBorrowingDetailsActivity.addToTargetedProfile(borrowerInfo.getName());
-                //Fix this bug as the add more item will cause the previous not updated screen to appear
                 refreshThisFragmentCalledFromButton(borrowerInfo);
-
+                //Back to main activity page
+                requireActivity().finish();
             }
         });
 
